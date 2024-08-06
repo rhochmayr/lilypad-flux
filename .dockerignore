@@ -1,0 +1,11 @@
+temp
+.venv
+*/blobs
+temp/*
+output/*
+cocktailpeanut/flux1-merged-q8/*
+cocktailpeanut/xulf-d/*
+# cocktailpeanut/xulf-s/*
+docker-compose.yml
+Dockerfile
+Dockerfile-Flux

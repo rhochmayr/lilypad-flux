@@ -61,7 +61,7 @@ def infer(prompt, checkpoint="black-forest-labs/FLUX.1-schnell", seed=42, guidan
                 transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-schnell-qint8")
             else:
                 print("initializing quantized transformer...")
-                transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-schnell-q8")
+                transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-schnell-q8", torch_dtype=dtype, device_map={"": "cuda"})
                 print("initialized!")
         print(f"moving device to {device}")
         transformer.to(device=device, dtype=dtype)
@@ -106,7 +106,7 @@ def update_slider(checkpoint, num_inference_steps):
         return 4
 with gr.Blocks(css=css) as demo:
     with gr.Column(elem_id="col-container"):
-        gr.HTML("<nav><img id='logo' src='file/icon.png'/></nav>")
+        # gr.HTML("<nav><img id='logo' src='file/icon.png'/></nav>")
         with gr.Row():
             prompt = gr.Text(
                 label="Prompt",
@@ -122,7 +122,7 @@ with gr.Blocks(css=css) as demo:
           value= "black-forest-labs/FLUX.1-schnell",
           choices=[
             "black-forest-labs/FLUX.1-schnell",
-            "sayakpaul/FLUX.1-merged"
+            # "sayakpaul/FLUX.1-merged"
           ]
         )
         seed = gr.Slider(
@@ -176,5 +176,5 @@ with gr.Blocks(css=css) as demo:
         inputs = [prompt, checkpoint, seed, guidance_scale, num_images_per_prompt, randomize_seed, width, height, num_inference_steps],
         outputs = [result, seed]
     )
-demo.launch()
+demo.launch(server_name="0.0.0.0")
 

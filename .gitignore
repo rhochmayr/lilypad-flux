@@ -6,3 +6,12 @@ cocktailpeanut/flux1-merged-q8/*
 cocktailpeanut/xulf-d/*
 cocktailpeanut/xulf-s/*
 cocktailpeanut/*
+
+# Ignore everything in the directory
+*
+
+# Don't ignore directories, so we can recurse into them
+!*/
+
+# Don't ignore the specific file
+!lilypad_module.json.tmpl

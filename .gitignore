@@ -11,7 +11,7 @@ cocktailpeanut/*
 *
 
 # Don't ignore directories, so we can recurse into them
-!*/
+# !*/
 
 # Don't ignore the specific file
 !lilypad_module.json.tmpl

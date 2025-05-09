@@ -1,8 +1,6 @@
 node_modules
 .DS_Store
 temp/*
-output/*
-cocktailpeanut/flux1-merged-q8/*
-cocktailpeanut/xulf-d/*
-cocktailpeanut/xulf-s/*
-cocktailpeanut/*
+outputs/*
+xulf-d
+flux1-schnell-q8

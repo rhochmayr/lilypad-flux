@@ -13,9 +13,11 @@
       "Docker": {
         "Entrypoint": [
           "python",
-          "output_script.py"
+          "app.py",
+          "--prompt",
+          "{{.prompt}}"
         ],
-        "Image": "arsen3d/flux:latest"
+        "Image": " arsen3d/lilypad-flux:schnell@sha256:0e93548f62649a6cfca55ecd60500cd46f778a588c0619c30b34329cf79f7f3"
       },
       "Engine": "Docker",
       "Network": {

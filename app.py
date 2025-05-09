@@ -10,6 +10,7 @@ from PIL import Image
 import json
 import devicetorch
 import os
+import argparse
 class QuantizedFluxTransformer2DModel(QuantizedDiffusersModel):
     base_class = FluxTransformer2DModel
 dtype = torch.bfloat16
@@ -29,7 +30,7 @@ nav {
 """
 #save all generated images into an output folder with unique name
 def save_images(images):  
-    output_folder = "output" 
+    output_folder = "outputs" 
     os.makedirs(output_folder, exist_ok=True)
     saved_paths = []
     
@@ -47,26 +48,26 @@ def infer(prompt, checkpoint="black-forest-labs/FLUX.1-schnell", seed=42, guidan
     global selected
     # if the new checkpoint is different from the selected one, re-instantiate the pipe
     if selected != checkpoint:
-        if checkpoint == "sayakpaul/FLUX.1-merged":
-            bfl_repo = "cocktailpeanut/xulf-d"
-            if device == "mps":
-                transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-merged-qint8")
-            else:
-                print("initializing quantized transformer...")
-                transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-merged-q8")
-                print("initialized!")
-        else:
-            bfl_repo = "cocktailpeanut/xulf-s"
-            if device == "mps":
-                transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-schnell-qint8")
-            else:
-                print("initializing quantized transformer...")
-                transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-schnell-q8", torch_dtype=dtype, device_map={"": "cuda"})
-                print("initialized!")
+        # if checkpoint == "sayakpaul/FLUX.1-merged":
+        #     bfl_repo = "cocktailpeanut/xulf-d"
+        #     if device == "mps":
+        #         transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-merged-qint8")
+        #     else:
+        #         print("initializing quantized transformer...")
+        #         transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-merged-q8")
+        #         print("initialized!")
+        # else:
+        #     bfl_repo = "cocktailpeanut/xulf-s"
+        #     if device == "mps":
+        #         transformer = QuantizedFluxTransformer2DModel.from_pretrained("cocktailpeanut/flux1-schnell-qint8")
+        #     else:
+        #         print("initializing quantized transformer...")
+        transformer = QuantizedFluxTransformer2DModel.from_pretrained("flux1-schnell-q8", torch_dtype=dtype, device_map={"": "cuda"})
+        print("initialized!")
         print(f"moving device to {device}")
         transformer.to(device=device, dtype=dtype)
         print(f"initializing pipeline...")
-        pipe = FluxPipeline.from_pretrained(bfl_repo, transformer=None, torch_dtype=dtype)
+        pipe = FluxPipeline.from_pretrained("xulf-d", transformer=None, torch_dtype=dtype)
         print("initialized!")
         pipe.transformer = transformer
         pipe.to(device)
@@ -176,5 +177,29 @@ with gr.Blocks(css=css) as demo:
         inputs = [prompt, checkpoint, seed, guidance_scale, num_images_per_prompt, randomize_seed, width, height, num_inference_steps],
         outputs = [result, seed]
     )
-demo.launch(server_name="0.0.0.0")
+# demo.launch(server_name="0.0.0.0")
 
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Run the Gradio demo or inference.")
+    parser.add_argument("--gradio", action="store_true", help="Launch the Gradio demo.")
+    parser.add_argument("--prompt", type=str, help="Run inference with the given prompt.")
+    args = parser.parse_args()
+
+    if args.gradio:
+        demo.launch(server_name="0.0.0.0")
+    elif args.prompt:
+        images, seed, saved_paths = infer(
+            prompt=args.prompt,
+            checkpoint="black-forest-labs/FLUX.1-schnell",
+            seed=42,
+            guidance_scale=0.0,
+            num_images_per_prompt=1,
+            randomize_seed=True,
+            width=1024,
+            height=1024,
+            num_inference_steps=4
+        )
+        print(f"Inference completed. Images saved at: {saved_paths}")
+    else:
+        print("No valid flag passed. Use --gradio to launch the demo or --prompt to run inference.")
